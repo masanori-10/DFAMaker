@@ -84,7 +84,7 @@ public class Marger {
 						}
 						int k = 0;
 						while (k < nextTransition.getOmittedSymbols().size()) {
-							int l = 1;
+							int l = k + 1;
 							while (l < nextTransition.getOmittedSymbols()
 									.size()) {
 								if (nextTransition
@@ -150,8 +150,8 @@ public class Marger {
 											.getSymbol() == null) || transitionA
 											.getSymbol().equals(
 													transitionB.getSymbol()))) {
-								boolean containA = false;
-								boolean containB = false;
+								boolean contain = false;
+								boolean equal = false;
 								State newState = null;
 								int predicateNumber = 0;
 								if (transitionA.getNextState()
@@ -165,20 +165,19 @@ public class Marger {
 											.getNextState()
 											.getPredicateNumber();
 								}
-								for (State checkState : stateList) { // TODO
-																		// equal
-									containA = checkState
-											.getCoStateNumber()
-											.containsAll(
-													transitionA.getNextState()
-															.getCoStateNumber());
-									containB = checkState
-											.getCoStateNumber()
-											.containsAll(
-													transitionB.getNextState()
-															.getCoStateNumber());
-									if (containA
-											&& containB
+								ArrayList<Integer> costateNumbers = new ArrayList<Integer>();
+								costateNumbers.addAll(transitionA
+										.getNextState().getCoStateNumber());
+								costateNumbers.addAll(transitionB
+										.getNextState().getCoStateNumber());
+								for (State checkState : stateList) {
+									contain = checkState.getCoStateNumber()
+											.containsAll(costateNumbers);
+									equal = costateNumbers
+											.containsAll(checkState
+													.getCoStateNumber());
+									if (contain
+											&& equal
 											&& predicateNumber == checkState
 													.getPredicateNumber()) {
 										newState = checkState;
