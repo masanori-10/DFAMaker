@@ -16,13 +16,13 @@ public class DFAReshaper {
 		predicateEraser = new PredicateEraser();
 	}
 
-	public void reshapeDEA(ArrayList<State> stateList) {
+	public void reshapeDEA(ArrayList<State> stateList, int maxScopeDepth) {
 		epsilonEraser.eraseEpsilon(stateList);
-
-		marger.margeTransition(stateList);
-		dummyEraser.eraseDummy(marger.getStateList());
-		predicateEraser.erasePredicate(dummyEraser.getStateList());
-
+		for (int scopeDepth = maxScopeDepth; scopeDepth > 0; scopeDepth--) {
+			marger.margeTransition(stateList, scopeDepth);
+			dummyEraser.eraseDummy(marger.getStateList());
+			predicateEraser.erasePredicate(dummyEraser.getStateList());
+		}
 		this.stateList = predicateEraser.getStateList();
 	}
 

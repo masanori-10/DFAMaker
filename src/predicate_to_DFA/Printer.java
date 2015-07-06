@@ -19,8 +19,9 @@ public class Printer {
 				if (transition.getSymbolCase() == SymbolCase.SYMBOL) {
 					System.out.print(transition.getSymbol() + "-->");
 				} else if (transition.getSymbolCase() == SymbolCase.OTHER) {
-					System.out.print(transition.getSymbolCase()
-							+ transition.getSymbol() + "-->");
+					System.out.print(transition.getSymbolCase());
+					System.out.print(transition.getOmittedSymbols().get());
+					System.out.print("-->");
 				} else {
 					System.out.print(transition.getSymbolCase() + "-->");
 				}

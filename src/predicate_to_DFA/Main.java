@@ -19,7 +19,8 @@ public class Main {
 				toNext = reader.read(args);
 				lexer.lexe(reader.getInputLine());
 				dfaMaker.makeDFA(lexer.getToken());
-				dfaReshaper.reshapeDEA(dfaMaker.getStateList());
+				dfaReshaper.reshapeDEA(dfaMaker.getStateList(),
+						dfaMaker.getMaxScopeDepth());
 				printer.printTransitions(dfaReshaper.getStateList());
 			} while (toNext);
 

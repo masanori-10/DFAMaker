@@ -15,6 +15,8 @@ public class DFAMaker {
 	private boolean repetitionFlag;
 	private boolean predicateFlag;
 	private Token token;
+	private int scopeDepth;
+	private int maxScopeDepth;
 
 	public DFAMaker() {
 		this.currentState = new State();
@@ -26,6 +28,8 @@ public class DFAMaker {
 		this.optionalFlag = false;
 		this.repetitionFlag = false;
 		this.predicateFlag = false;
+		this.scopeDepth = 1;
+		this.maxScopeDepth = 1;
 	}
 
 	public void makeDFA(ArrayList<String> tokenList)
@@ -52,6 +56,45 @@ public class DFAMaker {
 			case OPEN:
 				this.openPoints
 						.add(new StateLabel(this.currentState, position));
+				int i = 1;
+				int openCount = 1;
+				boolean check = true;
+				while (check) {
+					if (position + i >= tokenList.size()) {
+						if (openCount == 0) {
+							check = false;
+							break;
+						} else {
+							System.out
+									.println("Parentheses is not corresponding.");
+							throw new SyntaxErrorException();
+						}
+					}
+					switch (Token.getEnum(tokenList.get(position + i))) {
+					case OPEN:
+						openCount++;
+						break;
+					case CLOSE:
+						openCount--;
+						break;
+					case REPETITION:
+					case OPTIONAL:
+						if (openCount == 0) {
+							this.scopeDepth++;
+							check = false;
+						}
+						break;
+					default:
+						if (openCount == 0) {
+							check = false;
+						}
+					}
+					i++;
+				}
+
+				if (this.maxScopeDepth < scopeDepth) {
+					this.maxScopeDepth = scopeDepth;
+				}
 				break;
 			case CLOSE:
 				if (this.openPoints.isEmpty()) {
@@ -87,6 +130,7 @@ public class DFAMaker {
 							.getState()
 							.addNextTransition(
 									new EpsilonTransition(this.currentState));
+					this.scopeDepth--;
 					this.optionalFlag = false;
 					position++;
 				}
@@ -96,6 +140,7 @@ public class DFAMaker {
 									.getState()));
 					this.currentState = this.openPoints.get(
 							this.openPoints.size() - 1).getState();
+					this.scopeDepth--;
 					this.repetitionFlag = false;
 					position++;
 				}
@@ -132,6 +177,7 @@ public class DFAMaker {
 			case ANY:
 			case OTHER:
 				Transition transition = new Transition();
+				transition.setScopeDepth(this.scopeDepth);
 				State nextState = new State();
 				this.stateList.add(nextState);
 				if (this.token == Token.ANY) {
@@ -181,5 +227,9 @@ public class DFAMaker {
 
 	public ArrayList<State> getStateList() {
 		return this.stateList;
+	}
+
+	public int getMaxScopeDepth() {
+		return this.maxScopeDepth;
 	}
 }
