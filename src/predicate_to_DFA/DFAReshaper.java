@@ -24,10 +24,18 @@ public class DFAReshaper {
 			predicateEraser.erasePredicate(dummyEraser.getStateList());
 		}
 		this.stateList = predicateEraser.getStateList();
+		this.renumberingState();
 	}
 
 	public ArrayList<State> getStateList() {
 		return this.stateList;
 	}
 
+	public void renumberingState() {
+		for (int stateNumber = 0; stateNumber < this.stateList.size(); stateNumber++) {
+			if (this.stateList.get(stateNumber).getStateNumber() != -1) {
+				this.stateList.get(stateNumber).setStateNumber(stateNumber);
+			}
+		}
+	}
 }

@@ -234,6 +234,11 @@ public class Marger {
 											newTransition.setSymbolAndCase(
 													transition.getSymbol(),
 													transition.getSymbolCase());
+											if (newTransition.getSymbolCase() == SymbolCase.OTHER) {
+												newTransition
+														.setOmittedSymbols(transition
+																.getOmittedSymbols());
+											}
 											nextTransitions.add(newTransition);
 											nextTransitions.remove(l);
 										} else {

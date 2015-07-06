@@ -65,6 +65,10 @@ public class State {
 		this.stateNumber = -1;
 	}
 
+	public void setStateNumber(int stateNumber) {
+		this.stateNumber = stateNumber;
+	}
+
 }
 
 class StateLabel {
