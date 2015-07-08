@@ -32,9 +32,13 @@ public class DFAReshaper {
 	}
 
 	public void renumberingState() {
-		for (int stateNumber = 0; stateNumber < this.stateList.size(); stateNumber++) {
+		int stateNumber = 0;
+		while (stateNumber < this.stateList.size()) {
 			if (this.stateList.get(stateNumber).getStateNumber() != -1) {
 				this.stateList.get(stateNumber).setStateNumber(stateNumber);
+				stateNumber++;
+			} else {
+				this.stateList.remove(stateNumber);
 			}
 		}
 	}

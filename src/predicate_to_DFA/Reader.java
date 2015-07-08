@@ -66,4 +66,5 @@ public class Reader {
 	public String getInputLine() {
 		return this.inputLine;
 	}
+
 }

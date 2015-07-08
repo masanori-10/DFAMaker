@@ -45,6 +45,14 @@ public class DFAMaker {
 				}
 				this.mergePoints
 						.add(new StateLabel(this.currentState, position));
+				if (!(this.predicatePoints.isEmpty())) {
+					if (this.predicatePoints.get(
+							this.predicatePoints.size() - 1).getLabel() + 1 == this.openPoints
+							.get(this.openPoints.size() - 1).getLabel()) {
+						this.currentState
+								.setPredicateNumber(this.predicatePoints.size());
+					}
+				}
 				this.currentState = this.openPoints.get(
 						this.openPoints.size() - 1).getState();
 				break;
@@ -159,16 +167,15 @@ public class DFAMaker {
 				this.openPoints.remove(this.openPoints.size() - 1);
 				break;
 			case PREDICATE:
-				if (Token.getEnum(tokenList.get(position + 1)) == Token.ANY
-						|| Token.getEnum(tokenList.get(position + 1)) == Token.OTHER
-						|| Token.getEnum(tokenList.get(position + 1)) == Token.OPEN) {
-					if (Token.getEnum(tokenList.get(position + 1)) == Token.ANY
-							|| Token.getEnum(tokenList.get(position + 1)) == Token.OTHER) {
-						this.predicateFlag = true;
-					}
+				switch (Token.getEnum(tokenList.get(position + 1))) {
+				case ANY:
+				case OTHER:
+					this.predicateFlag = true;
+				case OPEN:
 					this.predicatePoints.add(new StateLabel(this.currentState,
 							position));
-				} else {
+					break;
+				default:
 					System.out
 							.println("Position of predicate operator(!) is invalid.");
 					throw new SyntaxErrorException();
