@@ -7,7 +7,7 @@ import predicate_to_DFA.Enum.SymbolCase;
 public class Marger {
 	private ArrayList<State> stateList;
 
-	public void margeTransition(ArrayList<State> stateList, int scopeDepth) {
+	public void margeTransition(ArrayList<State> stateList, int predicateNumber) {
 		this.stateList = stateList;
 		int i = 0;
 		while (i < this.stateList.size()) {

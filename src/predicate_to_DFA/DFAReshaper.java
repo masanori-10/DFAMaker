@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 public class DFAReshaper {
 	public EpsilonEraser epsilonEraser;
+	public PredicateMarger predicateMarger;
 	public Marger marger;
 	public DummyEraser dummyEraser;
 	public PredicateEraser predicateEraser;
@@ -11,15 +12,17 @@ public class DFAReshaper {
 
 	public DFAReshaper() {
 		epsilonEraser = new EpsilonEraser();
+		predicateMarger = new PredicateMarger();
 		marger = new Marger();
 		dummyEraser = new DummyEraser();
 		predicateEraser = new PredicateEraser();
 	}
 
-	public void reshapeDEA(ArrayList<State> stateList, int maxScopeDepth) {
+	public void reshapeDEA(ArrayList<State> stateList, int maxPredicateNumber) {
 		epsilonEraser.eraseEpsilon(stateList);
-		for (int scopeDepth = maxScopeDepth; scopeDepth > 0; scopeDepth--) {
-			marger.margeTransition(stateList, scopeDepth);
+		for (int predicateNumber = maxPredicateNumber; predicateNumber > 0; predicateNumber--) {
+
+			marger.margeTransition(stateList, predicateNumber);
 			dummyEraser.eraseDummy(marger.getStateList());
 			predicateEraser.erasePredicate(dummyEraser.getStateList());
 		}

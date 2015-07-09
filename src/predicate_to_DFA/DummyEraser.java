@@ -9,30 +9,31 @@ public class DummyEraser {
 	public void eraseDummy(ArrayList<State> stateList) {
 		this.stateList = stateList;
 		this.implementedStates = new ArrayList<State>();
-		int i = 0;
-		while (i < this.stateList.size()) {
-			if (this.stateList.get(i).getStateNumber() == 0) {
-				State startState = this.stateList.get(i);
+		int stateNumber = 0;
+		while (stateNumber < this.stateList.size()) {
+			if (this.stateList.get(stateNumber).getStateNumber() == 0) {
+				State startState = this.stateList.get(stateNumber);
 				this.implementedStates.add(startState);
 				this.checkNextTransition(startState);
 				break;
 			}
-			i++;
+			stateNumber++;
 		}
-		i = 0;
-		while (i < this.stateList.size()) {
-			if (!(this.implemented(this.stateList.get(i)))) {
-				this.stateList.remove(i);
+		stateNumber = 0;
+		while (stateNumber < this.stateList.size()) {
+			if (!(this.implemented(this.stateList.get(stateNumber)))) {
+				this.stateList.remove(stateNumber);
 			} else {
-				i++;
+				stateNumber++;
 			}
 		}
 	}
 
 	private void checkNextTransition(State startState) {
-		for (int i = 0; i < startState.getNextTransitions().size(); i++) {
-			State implementedState = startState.getNextTransitions().get(i)
-					.getNextState();
+		for (int transitionNumber = 0; transitionNumber < startState
+				.getNextTransitions().size(); transitionNumber++) {
+			State implementedState = startState.getNextTransitions()
+					.get(transitionNumber).getNextState();
 			if (!(this.implemented(implementedState))) {
 				this.implementedStates.add(implementedState);
 				this.checkNextTransition(implementedState);
@@ -41,8 +42,9 @@ public class DummyEraser {
 	}
 
 	private boolean implemented(State state) {
-		for (int i = 0; i < implementedStates.size(); i++) {
-			if (implementedStates.get(i) == state) {
+		for (int implementedStateNumber = 0; implementedStateNumber < implementedStates
+				.size(); implementedStateNumber++) {
+			if (implementedStates.get(implementedStateNumber) == state) {
 				return true;
 			}
 		}

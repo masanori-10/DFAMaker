@@ -9,11 +9,6 @@ public class Transition {
 	private String symbol;
 	private SymbolCase symbolCase;
 	private SymbolSet omittedSymbols;
-	private int scopeDepth;
-
-	public Transition() {
-
-	}
 
 	public void setNextState(State nextState) {
 		this.nextState = nextState;
@@ -40,10 +35,6 @@ public class Transition {
 		this.omittedSymbols.addAll(omittedSymbols.get());
 	}
 
-	public void setScopeDepth(int scopeDepth) {
-		this.scopeDepth = scopeDepth;
-	}
-
 	public State getNextState() {
 		return this.nextState;
 	}
@@ -59,9 +50,26 @@ public class Transition {
 	public SymbolSet getOmittedSymbols() {
 		return this.omittedSymbols;
 	}
+}
 
-	public int getScopeDepth() {
-		return this.scopeDepth;
+class PredicateTransition extends Transition {
+	private State predicateNextState;
+	private int predicateRank;
+
+	public void setPredicateNextState(State predicateNextState) {
+		this.predicateNextState = predicateNextState;
+	}
+
+	public void setPredicateRank(int predicateRank) {
+		this.predicateRank = predicateRank;
+	}
+
+	public State getPredicateNextState() {
+		return this.predicateNextState;
+	}
+
+	public int getPreicateRank() {
+		return this.predicateRank;
 	}
 }
 

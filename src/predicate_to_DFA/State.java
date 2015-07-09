@@ -6,8 +6,8 @@ public class State {
 	private ArrayList<Transition> nextTransitions;
 	private int stateNumber;
 	private ArrayList<Integer> coStateNumber;
-	private int predicateNumber;
 	static private int stateCounter;
+	private boolean isEOP;
 
 	static {
 		stateCounter = 0;
@@ -18,8 +18,8 @@ public class State {
 		this.coStateNumber = new ArrayList<Integer>();
 		this.stateNumber = stateCounter;
 		this.coStateNumber.add(stateCounter);
-		this.predicateNumber = 0;
 		stateCounter++;
+		this.isEOP = false;
 	}
 
 	public void addNextTransition(Transition nextTransition) {
@@ -28,10 +28,6 @@ public class State {
 
 	public void setNextTransitions(ArrayList<Transition> nextTransitions) {
 		this.nextTransitions = nextTransitions;
-	}
-
-	public void setPredicateNumber(int predicatePoint) {
-		this.predicateNumber = predicatePoint;
 	}
 
 	public void setCoStateNumber(ArrayList<Integer> coStateNumber) {
@@ -53,10 +49,6 @@ public class State {
 		return this.stateNumber;
 	}
 
-	public int getPredicateNumber() {
-		return this.predicateNumber;
-	}
-
 	public ArrayList<Integer> getCoStateNumber() {
 		return this.coStateNumber;
 	}
@@ -65,10 +57,17 @@ public class State {
 		this.stateNumber = -1;
 	}
 
+	public void setEOP() {
+		this.isEOP = true;
+	}
+
 	public void setStateNumber(int stateNumber) {
 		this.stateNumber = stateNumber;
 	}
 
+	public boolean isEOP() {
+		return this.isEOP;
+	}
 }
 
 class StateLabel {
