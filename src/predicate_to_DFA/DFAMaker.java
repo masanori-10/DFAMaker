@@ -100,9 +100,9 @@ public class DFAMaker {
 					position++;
 				}
 				if (!(this.predicatePoints.isEmpty())) {
-					if (this.predicatePoints.get(this.predicatePoints.size() - 1)
-							.getLabel() + 1 == this.openPoints.get(
-							this.openPoints.size() - 1).getLabel()) {
+					if (this.predicatePoints.get(
+							this.predicatePoints.size() - 1).getLabel() + 1 == this.openPoints
+							.get(this.openPoints.size() - 1).getLabel()) {
 						this.currentState = this.predicatePoints.get(
 								this.predicatePoints.size() - 1).getState();
 						this.predicatePoints
@@ -171,7 +171,8 @@ public class DFAMaker {
 				if (this.predicateFlag) {
 					this.currentState = this.predicatePoints.get(
 							this.predicatePoints.size() - 1).getState();
-					this.predicatePoints.remove(this.predicatePoints.size());
+					this.predicatePoints
+							.remove(this.predicatePoints.size() - 1);
 					this.predicateFlag = false;
 				} else {
 					this.currentState = nextState;

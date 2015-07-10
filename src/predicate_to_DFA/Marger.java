@@ -6,273 +6,283 @@ import predicate_to_DFA.Enum.SymbolCase;
 
 public class Marger {
 	private ArrayList<State> stateList;
+	private boolean isCompleted;
 
-	public void margeTransition(ArrayList<State> stateList, int predicateNumber) {
+	public boolean margeTransition(ArrayList<State> stateList) {
 		this.stateList = stateList;
-		int i = 0;
-		while (i < this.stateList.size()) {
-			State state = this.stateList.get(i);
-			if (state.getNextTransitions().size() > 1) {
-				SymbolSet symbolSet = new SymbolSet();
-				ArrayList<Transition> anyTransitions = new ArrayList<Transition>();
-				ArrayList<SymbolSet> omittedSymbolSetList = new ArrayList<SymbolSet>();
-				ArrayList<Transition> newTransitions = new ArrayList<Transition>();
-				newTransitions.addAll(state.getNextTransitions());
-				int j = 0;
-				while (j < newTransitions.size()) {
-					Transition transition = newTransitions.get(j);
-					if (transition.getSymbolCase() == SymbolCase.SYMBOL) {
-						symbolSet.add(transition.getSymbol());
-					}
-					j++;
-				}
-				if (!(symbolSet.isEmpty())) {
-					j = 0;
-					while (j < newTransitions.size()) {
-						Transition transition = newTransitions.get(j);
-						if (transition.getSymbolCase() == SymbolCase.OTHER) {
-							omittedSymbolSetList.add(transition
-									.getOmittedSymbols());
-							anyTransitions.add(transition);
-							newTransitions.remove(j);
-						} else if (transition.getSymbolCase() == SymbolCase.ANY) {
-							omittedSymbolSetList.add(new SymbolSet());
-							anyTransitions.add(transition);
-							newTransitions.remove(j);
-						} else {
-							j++;
-						}
+		this.isCompleted = true;
+		int stateNumber = 0;
+		while (stateNumber < this.stateList.size()) {
+			State currentState = this.stateList.get(stateNumber);
+			if (currentState.getNextTransitions().size() > 1) {
+				SymbolSet symbolOnSymbolTransitions = new SymbolSet();
+				for (int transitionNumber = 0; transitionNumber < currentState
+						.getNextTransitions().size(); transitionNumber++) {
+					Transition currentTransition = currentState
+							.getNextTransitions().get(transitionNumber);
+					if (currentTransition.getSymbolCase() == SymbolCase.SYMBOL) {
+						symbolOnSymbolTransitions.add(currentTransition
+								.getSymbol());
 					}
 				}
-				if (!(anyTransitions.isEmpty())) {
-					j = 0;
-					while (j < anyTransitions.size()) {
-						Transition anyTransition = anyTransitions.get(j);
-						for (int k = 0; k < symbolSet.size(); k++) {
-							boolean contain = false;
-							if (anyTransition.getSymbolCase() == SymbolCase.OTHER) {
-								for (String symbol : anyTransition
-										.getOmittedSymbols().get()) {
-									contain = symbolSet.get().get(k)
-											.equals(symbol);
-									if (contain) {
-										break;
-									}
-								}
-							}
-							if (!contain) {
-								Transition nextTransition = new Transition();
-								nextTransition.setScopeDepth(anyTransition
-										.getScopeDepth());
-								nextTransition.setNextState(anyTransition
-										.getNextState());
-								nextTransition.setSymbolAndCase(symbolSet.get()
-										.get(k), SymbolCase.SYMBOL);
-								newTransitions.add(nextTransition);
-							}
+				if (!(symbolOnSymbolTransitions.isEmpty())) {
+					ArrayList<Transition> anyOrOtherTransitions = new ArrayList<Transition>();
+					int transitionNumber = 0;
+					while (transitionNumber < currentState.getNextTransitions()
+							.size()) {
+						Transition transition = currentState
+								.getNextTransitions().get(transitionNumber);
+						switch (transition.getSymbolCase()) {
+						case OTHER:
+							anyOrOtherTransitions.add(transition);
+							currentState.getNextTransitions().remove(
+									transitionNumber);
+							break;
+						case ANY:
+							anyOrOtherTransitions.add(transition);
+							currentState.getNextTransitions().remove(
+									transitionNumber);
+							break;
+						default:
+							transitionNumber++;
 						}
-						Transition nextTransition = new Transition();
-						nextTransition.setScopeDepth(anyTransition
-								.getScopeDepth());
-						nextTransition.setNextState(anyTransition
-								.getNextState());
-						nextTransition.setSymbolCase(SymbolCase.OTHER);
-						nextTransition.setOmittedSymbols(symbolSet);
-						if (anyTransition.getSymbolCase() == SymbolCase.OTHER) {
-							nextTransition.addAllOmittedSymbols(anyTransition
-									.getOmittedSymbols());
-						}
-						int k = 0;
-						while (k < nextTransition.getOmittedSymbols().size()) {
-							int l = k + 1;
-							while (l < nextTransition.getOmittedSymbols()
-									.size()) {
-								if (nextTransition
-										.getOmittedSymbols()
-										.get()
-										.get(k)
-										.equals(nextTransition
-												.getOmittedSymbols().get()
-												.get(l))) {
-									nextTransition.getOmittedSymbols().get()
-											.remove(l);
-								} else {
-									l++;
-								}
-							}
-							k++;
-						}
-						newTransitions.add(nextTransition);
-						state.setNextTransitions(newTransitions);
-						j++;
 					}
-				}
-			}
-			int j = 0;
-			while (j < state.getNextTransitions().size()) {
-				Transition transitionA = state.getNextTransitions().get(j);
-				int k = j + 1;
-				while (k < state.getNextTransitions().size()) {
-					Transition transitionB = state.getNextTransitions().get(k);
-					if (transitionA.getNextState() == transitionB
-							.getNextState()
-							&& transitionA.getSymbolCase() == transitionB
-									.getSymbolCase()
-							&& ((transitionA.getSymbol() == null && transitionB
-									.getSymbol() == null) || transitionA
-									.getSymbol()
-									.equals(transitionB.getSymbol()))) {
-						ArrayList<Transition> newTransitions = state
-								.getNextTransitions();
-						newTransitions.remove(k);
-						state.setNextTransitions(newTransitions);
-						j = 0;
-						transitionA = state.getNextTransitions().get(j);
-						k = j + 1;
-					} else {
-						k++;
-					}
-				}
-				j++;
-			}
-			j = 0;
-			while (j < state.getNextTransitions().size()) {
-				if (state.getNextTransitions().get(j).getScopeDepth() >= scopeDepth) {
-					Transition transitionA = state.getNextTransitions().get(j);
-					int k = j + 1;
-					while (k < state.getNextTransitions().size()) {
-						if (state.getNextTransitions().get(k).getScopeDepth() >= scopeDepth) {
-							Transition transitionB = state.getNextTransitions()
-									.get(k);
-							if (transitionA.getSymbolCase() == transitionB
-									.getSymbolCase()
-									&& ((transitionA.getSymbol() == null && transitionB
-											.getSymbol() == null) || transitionA
-											.getSymbol().equals(
-													transitionB.getSymbol()))) {
+					if (!(anyOrOtherTransitions.isEmpty())) {
+						this.isCompleted = false;
+						transitionNumber = 0;
+						while (transitionNumber < anyOrOtherTransitions.size()) {
+							Transition currentAnyOrOtherTransition = anyOrOtherTransitions
+									.get(transitionNumber);
+							for (int symbolNumber = 0; symbolNumber < symbolOnSymbolTransitions
+									.size(); symbolNumber++) {
 								boolean contain = false;
-								boolean equal = false;
-								State newState = null;
-								int predicateNumber = 0;
-								if (transitionA.getNextState()
-										.getPredicateNumber() > transitionB
-										.getNextState().getPredicateNumber()) {
-									predicateNumber = transitionA
-											.getNextState()
-											.getPredicateNumber();
-								} else {
-									predicateNumber = transitionB
-											.getNextState()
-											.getPredicateNumber();
-								}
-								ArrayList<Integer> costateNumbers = new ArrayList<Integer>();
-								costateNumbers.addAll(transitionA
-										.getNextState().getCoStateNumber());
-								costateNumbers.addAll(transitionB
-										.getNextState().getCoStateNumber());
-								for (State checkState : stateList) {
-									contain = checkState.getCoStateNumber()
-											.containsAll(costateNumbers);
-									equal = costateNumbers
-											.containsAll(checkState
-													.getCoStateNumber());
-									if (contain
-											&& equal
-											&& predicateNumber == checkState
-													.getPredicateNumber()) {
-										newState = checkState;
-										break;
-									}
-								}
-								if (newState == null) {
-									newState = new State();
-									newState.setCoStateNumber(transitionA
-											.getNextState().getCoStateNumber(),
-											transitionB.getNextState()
-													.getCoStateNumber());
-									newState.setPredicateNumber(predicateNumber);
-									this.stateList.add(newState);
-									ArrayList<Transition> nextTransitions = new ArrayList<Transition>();
-									nextTransitions.addAll(transitionA
-											.getNextState()
-											.getNextTransitions());
-									nextTransitions.addAll(transitionB
-											.getNextState()
-											.getNextTransitions());
-									int l = 0;
-									while (l < nextTransitions.size()) {
-										Transition transition = nextTransitions
-												.get(l);
-										if (transition.getNextState()
-												.getPredicateNumber() < predicateNumber) {
-											Transition newTransition = new Transition();
-											newTransition
-													.setScopeDepth(transition
-															.getScopeDepth());
-											State predicateState;
-											if (transition.getNextState() instanceof AcceptState) {
-												predicateState = new AcceptState();
-												this.stateList
-														.add(predicateState);
-											} else {
-												predicateState = new State();
-												this.stateList
-														.add(predicateState);
-												predicateState
-														.setNextTransitions(transition
-																.getNextState()
-																.getNextTransitions());
-											}
-											predicateState
-													.setPredicateNumber(predicateNumber);
-											predicateState
-													.setCoStateNumber(transition
-															.getNextState()
-															.getCoStateNumber());
-											newTransition
-													.setNextState(predicateState);
-											newTransition.setSymbolAndCase(
-													transition.getSymbol(),
-													transition.getSymbolCase());
-											if (newTransition.getSymbolCase() == SymbolCase.OTHER) {
-												newTransition
-														.setOmittedSymbols(transition
-																.getOmittedSymbols());
-											}
-											nextTransitions.add(newTransition);
-											nextTransitions.remove(l);
-										} else {
-											l++;
+								if (currentAnyOrOtherTransition.getSymbolCase() == SymbolCase.OTHER) {
+									for (String symbol : currentAnyOrOtherTransition
+											.getOmittedSymbols().get()) {
+										contain = symbolOnSymbolTransitions
+												.get().get(symbolNumber)
+												.equals(symbol);
+										if (contain) {
+											break;
 										}
 									}
-									newState.setNextTransitions(nextTransitions);
 								}
-								Transition newTransition = new Transition();
-								newTransition.setScopeDepth(transitionA
-										.getScopeDepth());
-								newTransition.setNextState(newState);
-								newTransition.setSymbolAndCase(
-										transitionA.getSymbol(),
-										transitionA.getSymbolCase());
-								newTransition.setOmittedSymbols(transitionA
-										.getOmittedSymbols());
-								ArrayList<Transition> newTransitions = state
-										.getNextTransitions();
-								newTransitions.remove(k);
-								newTransitions.remove(j);
-								newTransitions.add(newTransition);
-								state.setNextTransitions(newTransitions);
-								j = -1;
-								break;
+								if (!contain) {
+									Transition newSymbolTransition = new Transition();
+									newSymbolTransition
+											.setNextState(currentAnyOrOtherTransition
+													.getNextState());
+									newSymbolTransition.setSymbolAndCase(
+											symbolOnSymbolTransitions.get()
+													.get(symbolNumber),
+											SymbolCase.SYMBOL);
+									currentState.getNextTransitions().add(
+											newSymbolTransition);
+								}
 							}
+							Transition newOtherTransition = new Transition();
+							SymbolSet currentOmittedSymbols = new SymbolSet();
+							currentOmittedSymbols
+									.addAll(symbolOnSymbolTransitions.get());
+							newOtherTransition
+									.setNextState(currentAnyOrOtherTransition
+											.getNextState());
+							newOtherTransition.setSymbolCase(SymbolCase.OTHER);
+							newOtherTransition
+									.setOmittedSymbols(currentOmittedSymbols);
+							if (currentAnyOrOtherTransition.getSymbolCase() == SymbolCase.OTHER) {
+								currentOmittedSymbols
+										.addAll(currentAnyOrOtherTransition
+												.getOmittedSymbols().get());
+							}
+							int omittedSymbolNumberA = 0;
+							while (omittedSymbolNumberA < currentOmittedSymbols
+									.size()) {
+								int omittedSymbolNumberB = omittedSymbolNumberA + 1;
+								while (omittedSymbolNumberB < currentOmittedSymbols
+										.size()) {
+									if (currentOmittedSymbols
+											.get()
+											.get(omittedSymbolNumberA)
+											.equals(currentOmittedSymbols.get()
+													.get(omittedSymbolNumberB))) {
+										currentOmittedSymbols.get().remove(
+												omittedSymbolNumberB);
+									} else {
+										omittedSymbolNumberB++;
+									}
+								}
+								omittedSymbolNumberA++;
+							}
+							currentState.getNextTransitions().add(
+									newOtherTransition);
+							transitionNumber++;
 						}
-						k++;
 					}
 				}
-				j++;
+				int transitionNumberA = 0;
+				while (transitionNumberA < currentState.getNextTransitions()
+						.size()) {
+					Transition currentTransitionA = currentState
+							.getNextTransitions().get(transitionNumberA);
+					int transitionNumberB = transitionNumberA + 1;
+					while (transitionNumberB < currentState
+							.getNextTransitions().size()) {
+						Transition currentTransitionB = currentState
+								.getNextTransitions().get(transitionNumberB);
+						if (currentTransitionA.getNextState() == currentTransitionB
+								.getNextState()
+								&& currentTransitionA.getSymbolCase() == currentTransitionB
+										.getSymbolCase()) {
+							switch (currentTransitionA.getSymbolCase()) {
+							case SYMBOL:
+								if ((currentTransitionA.getSymbol() == null && currentTransitionB
+										.getSymbol() == null)
+										|| currentTransitionA.getSymbol()
+												.equals(currentTransitionB
+														.getSymbol())) {
+									this.isCompleted = false;
+									currentState.getNextTransitions().remove(
+											transitionNumberB);
+								} else {
+									transitionNumberB++;
+								}
+								break;
+							case OTHER:
+								if (currentTransitionA
+										.getOmittedSymbols()
+										.get()
+										.containsAll(
+												currentTransitionB
+														.getOmittedSymbols()
+														.get())
+										&& currentTransitionB
+												.getOmittedSymbols()
+												.get()
+												.containsAll(
+														currentTransitionA
+																.getOmittedSymbols()
+																.get())) {
+									this.isCompleted = false;
+									currentState.getNextTransitions().remove(
+											transitionNumberB);
+								} else {
+									transitionNumberB++;
+								}
+								break;
+							default:
+								this.isCompleted = false;
+								currentState.getNextTransitions().remove(
+										transitionNumberB);
+							}
+						} else {
+							transitionNumberB++;
+						}
+					}
+					transitionNumberA++;
+				}
+				transitionNumberA = 0;
+				while (transitionNumberA < currentState.getNextTransitions()
+						.size()) {
+					Transition currentTransitionA = currentState
+							.getNextTransitions().get(transitionNumberA);
+					int transitionNumberB = transitionNumberA + 1;
+					while (transitionNumberB < currentState
+							.getNextTransitions().size()) {
+						Transition currentTransitionB = currentState
+								.getNextTransitions().get(transitionNumberB);
+						boolean equalAAndB = false;
+						if (currentTransitionA.getSymbolCase() == currentTransitionB
+								.getSymbolCase()) {
+							switch (currentTransitionA.getSymbolCase()) {
+							case SYMBOL:
+								if ((currentTransitionA.getSymbol() == null && currentTransitionB
+										.getSymbol() == null)
+										|| currentTransitionA.getSymbol()
+												.equals(currentTransitionB
+														.getSymbol())) {
+									equalAAndB = true;
+								}
+								break;
+							case OTHER:
+								if (currentTransitionA
+										.getOmittedSymbols()
+										.get()
+										.containsAll(
+												currentTransitionB
+														.getOmittedSymbols()
+														.get())
+										&& currentTransitionB
+												.getOmittedSymbols()
+												.get()
+												.containsAll(
+														currentTransitionA
+																.getOmittedSymbols()
+																.get())) {
+									equalAAndB = true;
+								}
+								break;
+							default:
+								equalAAndB = true;
+							}
+						}
+						if (equalAAndB) {
+							this.isCompleted = false;
+							boolean predefined = false;
+							State margedState = null;
+							ArrayList<Integer> costateNumbers = new ArrayList<Integer>();
+							costateNumbers.addAll(currentTransitionA
+									.getNextState().getCoStateNumber());
+							costateNumbers.addAll(currentTransitionB
+									.getNextState().getCoStateNumber());
+							for (State checkState : stateList) {
+								predefined = checkState.getCoStateNumber()
+										.containsAll(costateNumbers);
+								predefined = predefined
+										&& costateNumbers
+												.containsAll(checkState
+														.getCoStateNumber());
+								if (predefined) {
+									margedState = checkState;
+									break;
+								}
+							}
+							if (margedState == null) {
+								margedState = new State();
+								margedState.setCoStateNumber(costateNumbers);
+								this.stateList.add(margedState);
+								ArrayList<Transition> newTransitions = new ArrayList<Transition>();
+								newTransitions.addAll(currentTransitionA
+										.getNextState().getNextTransitions());
+								newTransitions.addAll(currentTransitionB
+										.getNextState().getNextTransitions());
+								margedState.setNextTransitions(newTransitions);
+							}
+							Transition margedTransition = new Transition();
+							margedTransition.setNextState(margedState);
+							margedTransition.setSymbolAndCase(
+									currentTransitionA.getSymbol(),
+									currentTransitionA.getSymbolCase());
+							margedTransition
+									.setOmittedSymbols(currentTransitionA
+											.getOmittedSymbols());
+							currentState.getNextTransitions().remove(
+									transitionNumberB);
+							currentState.getNextTransitions().remove(
+									transitionNumberA);
+							currentState.getNextTransitions().add(
+									margedTransition);
+							transitionNumberA = -1;
+							break;
+						}
+						transitionNumberB++;
+					}
+					transitionNumberA++;
+				}
 			}
-			i++;
+			stateNumber++;
 		}
+		return this.isCompleted;
 	}
 
 	public ArrayList<State> getStateList() {

@@ -26,6 +26,15 @@ public class State {
 		this.nextTransitions.add(nextTransition);
 	}
 
+	public void addAllNextTransitions(ArrayList<Transition> nextTransitions) {
+		this.nextTransitions.addAll(nextTransitions);
+	}
+
+	public void setNextTransition(Transition nextTransition) {
+		this.nextTransitions.clear();
+		this.nextTransitions.add(nextTransition);
+	}
+
 	public void setNextTransitions(ArrayList<Transition> nextTransitions) {
 		this.nextTransitions = nextTransitions;
 	}

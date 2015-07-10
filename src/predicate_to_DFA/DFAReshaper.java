@@ -3,12 +3,13 @@ package predicate_to_DFA;
 import java.util.ArrayList;
 
 public class DFAReshaper {
-	public EpsilonEraser epsilonEraser;
-	public PredicateMarger predicateMarger;
-	public Marger marger;
-	public DummyEraser dummyEraser;
-	public PredicateEraser predicateEraser;
-	public ArrayList<State> stateList;
+	private EpsilonEraser epsilonEraser;
+	private PredicateMarger predicateMarger;
+	private Marger marger;
+	private DummyEraser dummyEraser;
+	private PredicateEraser predicateEraser;
+	private ArrayList<State> stateList;
+	private boolean isCompleted;
 
 	public DFAReshaper() {
 		epsilonEraser = new EpsilonEraser();
@@ -18,13 +19,18 @@ public class DFAReshaper {
 		predicateEraser = new PredicateEraser();
 	}
 
-	public void reshapeDEA(ArrayList<State> stateList, int maxPredicateNumber) {
-		epsilonEraser.eraseEpsilon(stateList);
-		for (int predicateNumber = maxPredicateNumber; predicateNumber > 0; predicateNumber--) {
-
-			marger.margeTransition(stateList, predicateNumber);
-			dummyEraser.eraseDummy(marger.getStateList());
-			predicateEraser.erasePredicate(dummyEraser.getStateList());
+	public void reshapeDEA(ArrayList<State> stateList) {
+		while (!(this.isCompleted)) {
+			this.isCompleted = epsilonEraser.eraseEpsilon(stateList);
+			this.isCompleted = this.isCompleted
+					&& predicateMarger.margePredicate(stateList);
+			this.isCompleted = this.isCompleted
+					&& marger.margeTransition(predicateMarger.getStateList());
+			this.isCompleted = this.isCompleted
+					&& dummyEraser.eraseDummy(marger.getStateList());
+			this.isCompleted = this.isCompleted
+					&& predicateEraser.erasePredicate(dummyEraser
+							.getStateList());
 		}
 		this.stateList = predicateEraser.getStateList();
 		this.renumberingState();
