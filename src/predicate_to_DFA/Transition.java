@@ -54,22 +54,26 @@ public class Transition {
 
 class PredicateTransition extends Transition {
 	private State predicateNextState;
-	private int predicateRank;
+	private int predicateDepth;
+
+	public PredicateTransition() {
+		super.setSymbolCase(SymbolCase.PREDICATE);
+	}
 
 	public void setPredicateNextState(State predicateNextState) {
 		this.predicateNextState = predicateNextState;
 	}
 
-	public void setPredicateRank(int predicateRank) {
-		this.predicateRank = predicateRank;
+	public void setPredicateDepth(int predicateDepth) {
+		this.predicateDepth = predicateDepth;
 	}
 
 	public State getPredicateNextState() {
 		return this.predicateNextState;
 	}
 
-	public int getPreicateRank() {
-		return this.predicateRank;
+	public int getPreicateDepth() {
+		return this.predicateDepth;
 	}
 }
 
@@ -77,10 +81,7 @@ class EpsilonTransition extends Transition {
 	public EpsilonTransition(State nextState) {
 		super();
 		super.setNextState(nextState);
-	}
-
-	public State getNextState() {
-		return super.getNextState();
+		super.setSymbolCase(SymbolCase.EPSILON);
 	}
 }
 

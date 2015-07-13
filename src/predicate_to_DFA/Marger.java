@@ -30,16 +30,16 @@ public class Marger {
 					int transitionNumber = 0;
 					while (transitionNumber < currentState.getNextTransitions()
 							.size()) {
-						Transition transition = currentState
+						Transition currentTransition = currentState
 								.getNextTransitions().get(transitionNumber);
-						switch (transition.getSymbolCase()) {
+						switch (currentTransition.getSymbolCase()) {
 						case OTHER:
-							anyOrOtherTransitions.add(transition);
+							anyOrOtherTransitions.add(currentTransition);
 							currentState.getNextTransitions().remove(
 									transitionNumber);
 							break;
 						case ANY:
-							anyOrOtherTransitions.add(transition);
+							anyOrOtherTransitions.add(currentTransition);
 							currentState.getNextTransitions().remove(
 									transitionNumber);
 							break;
@@ -249,6 +249,11 @@ public class Marger {
 							}
 							if (margedState == null) {
 								margedState = new State();
+								if (currentTransitionA.getNextState().isEOP()
+										|| currentTransitionB.getNextState()
+												.isEOP()) {
+									margedState.setEOP();
+								}
 								margedState.setCoStateNumber(costateNumbers);
 								this.stateList.add(margedState);
 								ArrayList<Transition> newTransitions = new ArrayList<Transition>();

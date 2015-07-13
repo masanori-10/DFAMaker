@@ -15,6 +15,8 @@ public class DFAMaker {
 	private boolean repetitionFlag;
 	private boolean predicateFlag;
 	private Token token;
+	private int predicateDepth;
+	private int maxPredicateDepth;
 
 	public DFAMaker() {
 		this.currentState = new State();
@@ -26,6 +28,8 @@ public class DFAMaker {
 		this.optionalFlag = false;
 		this.repetitionFlag = false;
 		this.predicateFlag = false;
+		this.predicateDepth = 0;
+		this.maxPredicateDepth = 0;
 	}
 
 	public void makeDFA(ArrayList<String> tokenList)
@@ -39,10 +43,12 @@ public class DFAMaker {
 					System.out.println("Parentheses is not corresponding.");
 					throw new SyntaxErrorException();
 				}
-				this.mergePoints
-						.add(new StateLabel(this.currentState, position));
+				this.mergePoints.add(new StateLabel(this.currentState,
+						position, this.predicateDepth));
 				this.currentState = this.openPoints.get(
 						this.openPoints.size() - 1).getState();
+				this.predicateDepth = this.openPoints.get(
+						this.openPoints.size() - 1).getDepthLabel();
 				break;
 			case OPTIONAL:
 			case REPETITION:
@@ -50,8 +56,8 @@ public class DFAMaker {
 						.println("Position of optional or repetition operator(?,*) is invalid.");
 				throw new SyntaxErrorException();
 			case OPEN:
-				this.openPoints
-						.add(new StateLabel(this.currentState, position));
+				this.openPoints.add(new StateLabel(this.currentState, position,
+						this.predicateDepth));
 				break;
 			case CLOSE:
 				if (this.openPoints.isEmpty()) {
@@ -59,7 +65,7 @@ public class DFAMaker {
 					throw new SyntaxErrorException();
 				}
 				int openPoint = this.openPoints.get(this.openPoints.size() - 1)
-						.getLabel();
+						.getPositionLabel();
 				if (position + 1 < tokenList.size()) {
 					if (Token.getEnum(tokenList.get(position + 1)) == Token.OPTIONAL) {
 						this.optionalFlag = true;
@@ -69,12 +75,18 @@ public class DFAMaker {
 				}
 				if (!(this.mergePoints.isEmpty())) {
 					while (openPoint < this.mergePoints.get(
-							this.mergePoints.size() - 1).getLabel()) {
+							this.mergePoints.size() - 1).getPositionLabel()) {
 						this.mergePoints
 								.get(this.mergePoints.size() - 1)
 								.getState()
 								.addNextTransition(
 										new EpsilonTransition(this.currentState));
+						if (this.predicateDepth < this.mergePoints.get(
+								this.mergePoints.size() - 1).getDepthLabel()) {
+							this.predicateDepth = this.mergePoints.get(
+									this.mergePoints.size() - 1)
+									.getDepthLabel();
+						}
 						this.mergePoints.remove(this.mergePoints.size() - 1);
 						if (this.mergePoints.isEmpty()) {
 							break;
@@ -96,15 +108,20 @@ public class DFAMaker {
 									.getState()));
 					this.currentState = this.openPoints.get(
 							this.openPoints.size() - 1).getState();
+					this.predicateDepth = this.openPoints.get(
+							this.openPoints.size() - 1).getDepthLabel();
 					this.repetitionFlag = false;
 					position++;
 				}
 				if (!(this.predicatePoints.isEmpty())) {
 					if (this.predicatePoints.get(
-							this.predicatePoints.size() - 1).getLabel() + 1 == this.openPoints
-							.get(this.openPoints.size() - 1).getLabel()) {
+							this.predicatePoints.size() - 1).getPositionLabel() + 1 == this.openPoints
+							.get(this.openPoints.size() - 1).getPositionLabel()) {
 						this.currentState = this.predicatePoints.get(
 								this.predicatePoints.size() - 1).getState();
+						this.predicateDepth = this.predicatePoints.get(
+								this.predicatePoints.size() - 1)
+								.getDepthLabel();
 						this.predicatePoints
 								.remove(this.predicatePoints.size() - 1);
 					}
@@ -113,12 +130,18 @@ public class DFAMaker {
 				break;
 			case PREDICATE:
 				PredicateTransition predicateTransition = new PredicateTransition();
+				this.predicateDepth++;
+				if (this.maxPredicateDepth < this.predicateDepth) {
+					this.maxPredicateDepth = this.predicateDepth;
+				}
+				predicateTransition.setPredicateDepth(this.predicateDepth);
 				State predicateState = new State();
 				State nonPredicateState = new State();
 				this.stateList.add(predicateState);
 				this.stateList.add(nonPredicateState);
 				predicateTransition.setPredicateNextState(predicateState);
 				predicateTransition.setNextState(nonPredicateState);
+				this.currentState.addNextTransition(predicateTransition);
 				this.currentState = predicateState;
 				switch (Token.getEnum(tokenList.get(position + 1))) {
 				case ANY:
@@ -126,7 +149,7 @@ public class DFAMaker {
 					this.predicateFlag = true;
 				case OPEN:
 					this.predicatePoints.add(new StateLabel(nonPredicateState,
-							position));
+							position, this.predicateDepth));
 					break;
 				default:
 					System.out
@@ -185,5 +208,9 @@ public class DFAMaker {
 
 	public ArrayList<State> getStateList() {
 		return this.stateList;
+	}
+
+	public int getMaxPredicateDepth() {
+		return this.maxPredicateDepth;
 	}
 }

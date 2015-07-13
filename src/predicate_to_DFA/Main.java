@@ -18,7 +18,8 @@ public class Main {
 			reader.read(input);
 			lexer.lexe(reader.getInputLine());
 			dfaMaker.makeDFA(lexer.getToken());
-			dfaReshaper.reshapeDEA(dfaMaker.getStateList());
+			dfaReshaper.reshapeDEA(dfaMaker.getStateList(),
+					dfaMaker.getMaxPredicateDepth());
 			printer.printDOTFile(dfaReshaper.getStateList());
 
 		} catch (IOException e) {

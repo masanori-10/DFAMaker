@@ -36,7 +36,8 @@ public class State {
 	}
 
 	public void setNextTransitions(ArrayList<Transition> nextTransitions) {
-		this.nextTransitions = nextTransitions;
+		this.nextTransitions.clear();
+		this.nextTransitions.addAll(nextTransitions);
 	}
 
 	public void setCoStateNumber(ArrayList<Integer> coStateNumber) {
@@ -81,19 +82,25 @@ public class State {
 
 class StateLabel {
 	private State state;
-	private int label;
+	private int positionLabel;
+	private int depthLabel;
 
-	public StateLabel(State state, int label) {
+	public StateLabel(State state, int positionLabel, int depthLabel) {
 		this.state = state;
-		this.label = label;
+		this.positionLabel = positionLabel;
+		this.depthLabel = depthLabel;
 	}
 
 	public State getState() {
 		return this.state;
 	}
 
-	public int getLabel() {
-		return this.label;
+	public int getPositionLabel() {
+		return this.positionLabel;
+	}
+
+	public int getDepthLabel() {
+		return this.depthLabel;
 	}
 }
 
