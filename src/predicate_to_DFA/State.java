@@ -6,8 +6,9 @@ public class State {
 	private ArrayList<Transition> nextTransitions;
 	private int stateNumber;
 	private ArrayList<Integer> coStateNumber;
-	private int predicateNumber;
 	static private int stateCounter;
+	private boolean isEOP;
+	private int[] choiceLevel = { -1, -1 };
 
 	static {
 		stateCounter = 0;
@@ -18,20 +19,26 @@ public class State {
 		this.coStateNumber = new ArrayList<Integer>();
 		this.stateNumber = stateCounter;
 		this.coStateNumber.add(stateCounter);
-		this.predicateNumber = 0;
 		stateCounter++;
+		this.isEOP = false;
 	}
 
 	public void addNextTransition(Transition nextTransition) {
 		this.nextTransitions.add(nextTransition);
 	}
 
-	public void setNextTransitions(ArrayList<Transition> nextTransitions) {
-		this.nextTransitions = nextTransitions;
+	public void addAllNextTransitions(ArrayList<Transition> nextTransitions) {
+		this.nextTransitions.addAll(nextTransitions);
 	}
 
-	public void setPredicateNumber(int predicatePoint) {
-		this.predicateNumber = predicatePoint;
+	public void setNextTransition(Transition nextTransition) {
+		this.nextTransitions.clear();
+		this.nextTransitions.add(nextTransition);
+	}
+
+	public void setNextTransitions(ArrayList<Transition> nextTransitions) {
+		this.nextTransitions.clear();
+		this.nextTransitions.addAll(nextTransitions);
 	}
 
 	public void setCoStateNumber(ArrayList<Integer> coStateNumber) {
@@ -53,10 +60,6 @@ public class State {
 		return this.stateNumber;
 	}
 
-	public int getPredicateNumber() {
-		return this.predicateNumber;
-	}
-
 	public ArrayList<Integer> getCoStateNumber() {
 		return this.coStateNumber;
 	}
@@ -65,27 +68,49 @@ public class State {
 		this.stateNumber = -1;
 	}
 
+	public void setEOP() {
+		this.isEOP = true;
+	}
+
 	public void setStateNumber(int stateNumber) {
 		this.stateNumber = stateNumber;
 	}
 
+	public boolean isEOP() {
+		return this.isEOP;
+	}
+
+	public void setChoiceLevel(int choiceNumber, int routeLevel) {
+		this.choiceLevel[0] = choiceNumber;
+		this.choiceLevel[1] = routeLevel;
+	}
+
+	public int getChoiceNumber() {
+		return this.choiceLevel[0];
+	}
 }
 
 class StateLabel {
 	private State state;
-	private int label;
+	private int positionLabel;
+	private int depthLabel;
 
-	public StateLabel(State state, int label) {
+	public StateLabel(State state, int positionLabel, int depthLabel) {
 		this.state = state;
-		this.label = label;
+		this.positionLabel = positionLabel;
+		this.depthLabel = depthLabel;
 	}
 
 	public State getState() {
 		return this.state;
 	}
 
-	public int getLabel() {
-		return this.label;
+	public int getPositionLabel() {
+		return this.positionLabel;
+	}
+
+	public int getDepthLabel() {
+		return this.depthLabel;
 	}
 }
 

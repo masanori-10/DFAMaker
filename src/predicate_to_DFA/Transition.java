@@ -9,11 +9,6 @@ public class Transition {
 	private String symbol;
 	private SymbolCase symbolCase;
 	private SymbolSet omittedSymbols;
-	private int scopeDepth;
-
-	public Transition() {
-
-	}
 
 	public void setNextState(State nextState) {
 		this.nextState = nextState;
@@ -40,10 +35,6 @@ public class Transition {
 		this.omittedSymbols.addAll(omittedSymbols.get());
 	}
 
-	public void setScopeDepth(int scopeDepth) {
-		this.scopeDepth = scopeDepth;
-	}
-
 	public State getNextState() {
 		return this.nextState;
 	}
@@ -59,9 +50,30 @@ public class Transition {
 	public SymbolSet getOmittedSymbols() {
 		return this.omittedSymbols;
 	}
+}
 
-	public int getScopeDepth() {
-		return this.scopeDepth;
+class PredicateTransition extends Transition {
+	private State predicateNextState;
+	private int predicateDepth;
+
+	public PredicateTransition() {
+		super.setSymbolCase(SymbolCase.PREDICATE);
+	}
+
+	public void setPredicateNextState(State predicateNextState) {
+		this.predicateNextState = predicateNextState;
+	}
+
+	public void setPredicateDepth(int predicateDepth) {
+		this.predicateDepth = predicateDepth;
+	}
+
+	public State getPredicateNextState() {
+		return this.predicateNextState;
+	}
+
+	public int getPreicateDepth() {
+		return this.predicateDepth;
 	}
 }
 
@@ -69,10 +81,7 @@ class EpsilonTransition extends Transition {
 	public EpsilonTransition(State nextState) {
 		super();
 		super.setNextState(nextState);
-	}
-
-	public State getNextState() {
-		return super.getNextState();
+		super.setSymbolCase(SymbolCase.EPSILON);
 	}
 }
 
@@ -113,5 +122,20 @@ class SymbolSet {
 
 	public int size() {
 		return this.symbolSet.size();
+	}
+
+	public void organize() {
+		for (int symbolNumberA = 0; symbolNumberA < this.size(); symbolNumberA++) {
+			String symbolA = this.symbolSet.get(symbolNumberA);
+			int symbolNumberB = symbolNumberA + 1;
+			while (symbolNumberB < this.size()) {
+				String symbolB = this.symbolSet.get(symbolNumberB);
+				if (symbolA.equals(symbolB)) {
+					this.symbolSet.remove(symbolNumberB);
+				} else {
+					symbolNumberB++;
+				}
+			}
+		}
 	}
 }

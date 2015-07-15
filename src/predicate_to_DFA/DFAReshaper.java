@@ -3,25 +3,30 @@ package predicate_to_DFA;
 import java.util.ArrayList;
 
 public class DFAReshaper {
-	public EpsilonEraser epsilonEraser;
-	public Marger marger;
-	public DummyEraser dummyEraser;
-	public PredicateEraser predicateEraser;
-	public ArrayList<State> stateList;
+	private EpsilonEraser epsilonEraser;
+	private PredicateMarger predicateMarger;
+	private Marger marger;
+	private DummyEraser dummyEraser;
+	private PredicateEraser predicateEraser;
+	private ArrayList<State> stateList;
 
 	public DFAReshaper() {
 		epsilonEraser = new EpsilonEraser();
+		predicateMarger = new PredicateMarger();
 		marger = new Marger();
 		dummyEraser = new DummyEraser();
 		predicateEraser = new PredicateEraser();
 	}
 
-	public void reshapeDEA(ArrayList<State> stateList, int maxScopeDepth) {
-		epsilonEraser.eraseEpsilon(stateList);
-		for (int scopeDepth = maxScopeDepth; scopeDepth > 0; scopeDepth--) {
-			marger.margeTransition(stateList, scopeDepth);
+	public void reshapeDEA(ArrayList<State> stateList, int maxPredicateDepth)
+			throws CodingErrorException {
+		while (maxPredicateDepth >= 0) {
+			epsilonEraser.eraseEpsilon(stateList);
+			predicateMarger.margePredicate(stateList, maxPredicateDepth);
+			marger.margeTransition(predicateMarger.getStateList());
 			dummyEraser.eraseDummy(marger.getStateList());
 			predicateEraser.erasePredicate(dummyEraser.getStateList());
+			maxPredicateDepth--;
 		}
 		this.stateList = predicateEraser.getStateList();
 		this.renumberingState();

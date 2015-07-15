@@ -8,8 +8,10 @@ public class Printer {
 	// private int stateNumber = 0;
 	// private int transitionNumber = 0;
 
-	public void printDOTFile(ArrayList<State> stateList) {
+	public void printDOTFile(ArrayList<State> stateList, String input) {
 		System.out.println("digraph DFA {");
+		input = input.replace("@", "");
+		System.out.println("	\"" + input + "\";");
 		for (int i = 0; i < stateList.size(); i++) {
 			State state = stateList.get(i);
 			// if (!(state.getStateNumber() == -1)) {
@@ -37,7 +39,26 @@ public class Printer {
 					if (transition.getSymbolCase() == SymbolCase.SYMBOL) {
 						System.out.print(transition.getSymbol());
 					} else if (transition.getSymbolCase() == SymbolCase.OTHER) {
-						System.out.print(transition.getOmittedSymbols().get());
+						String omittedSymbols = null;
+						int lengthCounter = 0;
+						for (String symbol : transition.getOmittedSymbols()
+								.get()) {
+							if (omittedSymbols == null) {
+								System.out.print("_");
+								omittedSymbols = symbol;
+							} else {
+								if (lengthCounter == 2) {
+									System.out.print("_");
+									lengthCounter = 0;
+								}
+								System.out.print("_");
+								omittedSymbols += ",";
+								omittedSymbols += symbol;
+							}
+							lengthCounter++;
+						}
+						System.out.print("\\n");
+						System.out.print(omittedSymbols);
 					} else {
 						System.out.print(transition.getSymbolCase());
 					}

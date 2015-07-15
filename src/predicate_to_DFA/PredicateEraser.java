@@ -7,29 +7,28 @@ public class PredicateEraser {
 
 	public void erasePredicate(ArrayList<State> stateList) {
 		this.stateList = stateList;
-		int i = 0;
-		while (i < this.stateList.size()) {
-			if (this.stateList.get(i).getPredicateNumber() % 2 == 1) {
-				this.stateList.remove(i);
+		int stateNumber = 0;
+		while (stateNumber < this.stateList.size()) {
+			if (this.stateList.get(stateNumber).isEOP()) {
+				this.stateList.remove(stateNumber);
 			} else {
-				i++;
+				stateNumber++;
 			}
 		}
-		i = 0;
-		while (i < this.stateList.size()) {
-			int j = 0;
-			State state = this.stateList.get(i);
-			while (j < state.getNextTransitions().size()) {
-				if (state.getNextTransitions().get(j).getNextState()
-						.getPredicateNumber() % 2 == 1) {
-					state.getNextTransitions().remove(j);
+		stateNumber = 0;
+		while (stateNumber < this.stateList.size()) {
+			int transitionNumber = 0;
+			State currentState = this.stateList.get(stateNumber);
+			while (transitionNumber < currentState.getNextTransitions().size()) {
+				if (currentState.getNextTransitions().get(transitionNumber)
+						.getNextState().isEOP()) {
+					currentState.getNextTransitions().remove(transitionNumber);
 				} else {
-					j++;
+					transitionNumber++;
 				}
 			}
-			i++;
+			stateNumber++;
 		}
-
 	}
 
 	public ArrayList<State> getStateList() {

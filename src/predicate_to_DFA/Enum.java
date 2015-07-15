@@ -35,6 +35,6 @@ public class Enum {
 	}
 
 	public enum SymbolCase {
-		ANY, EOF, OTHER, SYMBOL;
+		ANY, EOF, EPSILON, OTHER, PREDICATE, SYMBOL;
 	}
 }
