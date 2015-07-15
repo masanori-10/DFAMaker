@@ -20,7 +20,8 @@ public class Main {
 			dfaMaker.makeDFA(lexer.getToken());
 			dfaReshaper.reshapeDEA(dfaMaker.getStateList(),
 					dfaMaker.getMaxPredicateDepth());
-			printer.printDOTFile(dfaReshaper.getStateList());
+			printer.printDOTFile(dfaReshaper.getStateList(),
+					reader.getInputLine());
 
 		} catch (IOException e) {
 			System.out.println(e + "(Input is invalid.)");

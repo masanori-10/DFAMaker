@@ -123,4 +123,19 @@ class SymbolSet {
 	public int size() {
 		return this.symbolSet.size();
 	}
+
+	public void organize() {
+		for (int symbolNumberA = 0; symbolNumberA < this.size(); symbolNumberA++) {
+			String symbolA = this.symbolSet.get(symbolNumberA);
+			int symbolNumberB = symbolNumberA + 1;
+			while (symbolNumberB < this.size()) {
+				String symbolB = this.symbolSet.get(symbolNumberB);
+				if (symbolA.equals(symbolB)) {
+					this.symbolSet.remove(symbolNumberB);
+				} else {
+					symbolNumberB++;
+				}
+			}
+		}
+	}
 }

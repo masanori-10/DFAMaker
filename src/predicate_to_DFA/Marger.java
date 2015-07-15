@@ -6,26 +6,28 @@ import predicate_to_DFA.Enum.SymbolCase;
 
 public class Marger {
 	private ArrayList<State> stateList;
-	private boolean isCompleted;
 
-	public boolean margeTransition(ArrayList<State> stateList) {
+	public void margeTransition(ArrayList<State> stateList)
+			throws CodingErrorException {
 		this.stateList = stateList;
-		this.isCompleted = true;
-		int stateNumber = 0;
-		while (stateNumber < this.stateList.size()) {
+		for (int stateNumber = 0; stateNumber < this.stateList.size(); stateNumber++) {
 			State currentState = this.stateList.get(stateNumber);
 			if (currentState.getNextTransitions().size() > 1) {
-				SymbolSet symbolOnSymbolTransitions = new SymbolSet();
+
+				SymbolSet requiredSymbols = new SymbolSet();
 				for (int transitionNumber = 0; transitionNumber < currentState
 						.getNextTransitions().size(); transitionNumber++) {
 					Transition currentTransition = currentState
 							.getNextTransitions().get(transitionNumber);
 					if (currentTransition.getSymbolCase() == SymbolCase.SYMBOL) {
-						symbolOnSymbolTransitions.add(currentTransition
-								.getSymbol());
+						requiredSymbols.add(currentTransition.getSymbol());
+					} else if (currentTransition.getSymbolCase() == SymbolCase.OTHER) {
+						requiredSymbols.addAll(currentTransition
+								.getOmittedSymbols().get());
 					}
 				}
-				if (!(symbolOnSymbolTransitions.isEmpty())) {
+				requiredSymbols.organize();
+				if (!(requiredSymbols.isEmpty())) {
 					ArrayList<Transition> anyOrOtherTransitions = new ArrayList<Transition>();
 					int transitionNumber = 0;
 					while (transitionNumber < currentState.getNextTransitions()
@@ -48,78 +50,58 @@ public class Marger {
 						}
 					}
 					if (!(anyOrOtherTransitions.isEmpty())) {
-						this.isCompleted = false;
 						transitionNumber = 0;
 						while (transitionNumber < anyOrOtherTransitions.size()) {
 							Transition currentAnyOrOtherTransition = anyOrOtherTransitions
 									.get(transitionNumber);
-							for (int symbolNumber = 0; symbolNumber < symbolOnSymbolTransitions
-									.size(); symbolNumber++) {
-								boolean contain = false;
-								if (currentAnyOrOtherTransition.getSymbolCase() == SymbolCase.OTHER) {
-									for (String symbol : currentAnyOrOtherTransition
+							SymbolSet symbolToMake = new SymbolSet();
+							symbolToMake.addAll(requiredSymbols.get());
+							switch (currentAnyOrOtherTransition.getSymbolCase()) {
+							case OTHER:
+								symbolToMake.get().clear();
+								for (String symbolA : requiredSymbols.get()) {
+									boolean contain = false;
+									for (String symbolB : currentAnyOrOtherTransition
 											.getOmittedSymbols().get()) {
-										contain = symbolOnSymbolTransitions
-												.get().get(symbolNumber)
-												.equals(symbol);
-										if (contain) {
+										if (symbolB.equals(symbolA)) {
+											contain = true;
 											break;
 										}
 									}
+									if (!(contain)) {
+										symbolToMake.add(symbolA);
+									}
 								}
-								if (!contain) {
+							case ANY:
+								for (String symbol : symbolToMake.get()) {
 									Transition newSymbolTransition = new Transition();
 									newSymbolTransition
 											.setNextState(currentAnyOrOtherTransition
 													.getNextState());
 									newSymbolTransition.setSymbolAndCase(
-											symbolOnSymbolTransitions.get()
-													.get(symbolNumber),
-											SymbolCase.SYMBOL);
-									currentState.getNextTransitions().add(
-											newSymbolTransition);
+											symbol, SymbolCase.SYMBOL);
+									currentState
+											.addNextTransition(newSymbolTransition);
 								}
+								Transition newOtherTransition = new Transition();
+								newOtherTransition
+										.setNextState(currentAnyOrOtherTransition
+												.getNextState());
+								newOtherTransition
+										.setSymbolCase(SymbolCase.OTHER);
+								newOtherTransition
+										.setOmittedSymbols(requiredSymbols);
+								currentState
+										.addNextTransition(newOtherTransition);
+								break;
+							default:
+								throw new CodingErrorException();
 							}
-							Transition newOtherTransition = new Transition();
-							SymbolSet currentOmittedSymbols = new SymbolSet();
-							currentOmittedSymbols
-									.addAll(symbolOnSymbolTransitions.get());
-							newOtherTransition
-									.setNextState(currentAnyOrOtherTransition
-											.getNextState());
-							newOtherTransition.setSymbolCase(SymbolCase.OTHER);
-							newOtherTransition
-									.setOmittedSymbols(currentOmittedSymbols);
-							if (currentAnyOrOtherTransition.getSymbolCase() == SymbolCase.OTHER) {
-								currentOmittedSymbols
-										.addAll(currentAnyOrOtherTransition
-												.getOmittedSymbols().get());
-							}
-							int omittedSymbolNumberA = 0;
-							while (omittedSymbolNumberA < currentOmittedSymbols
-									.size()) {
-								int omittedSymbolNumberB = omittedSymbolNumberA + 1;
-								while (omittedSymbolNumberB < currentOmittedSymbols
-										.size()) {
-									if (currentOmittedSymbols
-											.get()
-											.get(omittedSymbolNumberA)
-											.equals(currentOmittedSymbols.get()
-													.get(omittedSymbolNumberB))) {
-										currentOmittedSymbols.get().remove(
-												omittedSymbolNumberB);
-									} else {
-										omittedSymbolNumberB++;
-									}
-								}
-								omittedSymbolNumberA++;
-							}
-							currentState.getNextTransitions().add(
-									newOtherTransition);
 							transitionNumber++;
 						}
 					}
 				}
+
 				int transitionNumberA = 0;
 				while (transitionNumberA < currentState.getNextTransitions()
 						.size()) {
@@ -141,7 +123,6 @@ public class Marger {
 										|| currentTransitionA.getSymbol()
 												.equals(currentTransitionB
 														.getSymbol())) {
-									this.isCompleted = false;
 									currentState.getNextTransitions().remove(
 											transitionNumberB);
 								} else {
@@ -163,7 +144,6 @@ public class Marger {
 														currentTransitionA
 																.getOmittedSymbols()
 																.get())) {
-									this.isCompleted = false;
 									currentState.getNextTransitions().remove(
 											transitionNumberB);
 								} else {
@@ -171,7 +151,6 @@ public class Marger {
 								}
 								break;
 							default:
-								this.isCompleted = false;
 								currentState.getNextTransitions().remove(
 										transitionNumberB);
 							}
@@ -181,6 +160,7 @@ public class Marger {
 					}
 					transitionNumberA++;
 				}
+
 				transitionNumberA = 0;
 				while (transitionNumberA < currentState.getNextTransitions()
 						.size()) {
@@ -227,7 +207,6 @@ public class Marger {
 							}
 						}
 						if (equalAAndB) {
-							this.isCompleted = false;
 							boolean predefined = false;
 							State margedState = null;
 							ArrayList<Integer> costateNumbers = new ArrayList<Integer>();
@@ -284,10 +263,9 @@ public class Marger {
 					}
 					transitionNumberA++;
 				}
+
 			}
-			stateNumber++;
 		}
-		return this.isCompleted;
 	}
 
 	public ArrayList<State> getStateList() {

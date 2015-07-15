@@ -8,6 +8,7 @@ public class State {
 	private ArrayList<Integer> coStateNumber;
 	static private int stateCounter;
 	private boolean isEOP;
+	private int[] choiceLevel = { -1, -1 };
 
 	static {
 		stateCounter = 0;
@@ -77,6 +78,15 @@ public class State {
 
 	public boolean isEOP() {
 		return this.isEOP;
+	}
+
+	public void setChoiceLevel(int choiceNumber, int routeLevel) {
+		this.choiceLevel[0] = choiceNumber;
+		this.choiceLevel[1] = routeLevel;
+	}
+
+	public int getChoiceNumber() {
+		return this.choiceLevel[0];
 	}
 }
 

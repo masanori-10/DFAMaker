@@ -4,12 +4,10 @@ import java.util.ArrayList;
 
 public class DummyEraser {
 	private ArrayList<State> stateList;
-	private boolean isCompleted;
 	private ArrayList<State> implementedStates;
 
-	public boolean eraseDummy(ArrayList<State> stateList) {
+	public void eraseDummy(ArrayList<State> stateList) {
 		this.stateList = stateList;
-		this.isCompleted = true;
 		this.implementedStates = new ArrayList<State>();
 		int stateNumber = 0;
 		while (stateNumber < this.stateList.size()) {
@@ -24,13 +22,11 @@ public class DummyEraser {
 		stateNumber = 0;
 		while (stateNumber < this.stateList.size()) {
 			if (!(this.implemented(this.stateList.get(stateNumber)))) {
-				this.isCompleted = false;
 				this.stateList.remove(stateNumber);
 			} else {
 				stateNumber++;
 			}
 		}
-		return this.isCompleted;
 	}
 
 	private void checkNextTransition(State startState) {
@@ -41,6 +37,15 @@ public class DummyEraser {
 			if (!(this.implemented(implementedState))) {
 				this.implementedStates.add(implementedState);
 				this.checkNextTransition(implementedState);
+			}
+			if (startState.getNextTransitions().get(transitionNumber) instanceof PredicateTransition) {
+				implementedState = ((PredicateTransition) startState
+						.getNextTransitions().get(transitionNumber))
+						.getPredicateNextState();
+				if (!(this.implemented(implementedState))) {
+					this.implementedStates.add(implementedState);
+					this.checkNextTransition(implementedState);
+				}
 			}
 		}
 	}

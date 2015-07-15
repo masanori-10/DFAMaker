@@ -4,11 +4,9 @@ import java.util.ArrayList;
 
 public class PredicateEraser {
 	private ArrayList<State> stateList;
-	private boolean isCompeted;
 
-	public boolean erasePredicate(ArrayList<State> stateList) {
+	public void erasePredicate(ArrayList<State> stateList) {
 		this.stateList = stateList;
-		this.isCompeted = true;
 		int stateNumber = 0;
 		while (stateNumber < this.stateList.size()) {
 			if (this.stateList.get(stateNumber).isEOP()) {
@@ -31,7 +29,6 @@ public class PredicateEraser {
 			}
 			stateNumber++;
 		}
-		return this.isCompeted;
 	}
 
 	public ArrayList<State> getStateList() {
