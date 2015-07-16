@@ -8,7 +8,7 @@ public class State {
 	private ArrayList<Integer> coStateNumber;
 	static private int stateCounter;
 	private boolean isEOP;
-	private int[] choiceLevel = { -1, -1 };
+	private boolean isEOS;
 
 	static {
 		stateCounter = 0;
@@ -21,6 +21,7 @@ public class State {
 		this.coStateNumber.add(stateCounter);
 		stateCounter++;
 		this.isEOP = false;
+		this.isEOS = false;
 	}
 
 	public void addNextTransition(Transition nextTransition) {
@@ -80,13 +81,12 @@ public class State {
 		return this.isEOP;
 	}
 
-	public void setChoiceLevel(int choiceNumber, int routeLevel) {
-		this.choiceLevel[0] = choiceNumber;
-		this.choiceLevel[1] = routeLevel;
+	public void setEOS() {
+		this.isEOS = true;
 	}
 
-	public int getChoiceNumber() {
-		return this.choiceLevel[0];
+	public boolean isEOS() {
+		return this.isEOS;
 	}
 }
 

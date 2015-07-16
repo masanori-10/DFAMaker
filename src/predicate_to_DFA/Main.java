@@ -9,6 +9,7 @@ public class Main {
 		input[0] = "input";
 		Reader reader = new Reader();
 		Lexer lexer = new Lexer();
+		PEGReshaper pegReshaper = new PEGReshaper();
 		DFAMaker dfaMaker = new DFAMaker();
 		DFAReshaper dfaReshaper = new DFAReshaper();
 		Printer printer = new Printer();
@@ -17,7 +18,8 @@ public class Main {
 
 			reader.read(input);
 			lexer.lexe(reader.getInputLine());
-			dfaMaker.makeDFA(lexer.getToken());
+			pegReshaper.reshapePEG(lexer.getToken());
+			dfaMaker.makeDFA(pegReshaper.getTokenList());
 			dfaReshaper.reshapeDEA(dfaMaker.getStateList(),
 					dfaMaker.getMaxPredicateDepth());
 			printer.printDOTFile(dfaReshaper.getStateList(),

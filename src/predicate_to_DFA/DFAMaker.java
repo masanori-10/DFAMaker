@@ -17,8 +17,6 @@ public class DFAMaker {
 	private Token token;
 	private int predicateDepth;
 	private int maxPredicateDepth;
-	private int choiceNumber;
-	private ArrayList<Integer> routeLevel;
 
 	public DFAMaker() {
 		this.currentState = new State();
@@ -32,8 +30,6 @@ public class DFAMaker {
 		this.predicateFlag = false;
 		this.predicateDepth = 0;
 		this.maxPredicateDepth = 0;
-		this.choiceNumber = 0;
-		this.routeLevel = new ArrayList<Integer>();
 	}
 
 	public void makeDFA(ArrayList<String> tokenList)
@@ -49,12 +45,6 @@ public class DFAMaker {
 				}
 				this.mergePoints.add(new StateLabel(this.currentState,
 						position, this.predicateDepth));
-				this.currentState.setChoiceLevel(
-						this.openPoints.get(this.openPoints.size() - 1)
-								.getState().getChoiceNumber(),
-						this.routeLevel.get(this.routeLevel.size() - 1));
-				this.routeLevel.set(this.routeLevel.size() - 1,
-						(this.routeLevel.get(this.routeLevel.size() - 1) + 1));
 				this.currentState = this.openPoints.get(
 						this.openPoints.size() - 1).getState();
 				this.predicateDepth = this.openPoints.get(
@@ -68,9 +58,6 @@ public class DFAMaker {
 			case OPEN:
 				this.openPoints.add(new StateLabel(this.currentState, position,
 						this.predicateDepth));
-				this.currentState.setChoiceLevel(this.choiceNumber, -1);
-				this.choiceNumber++;
-				this.routeLevel.add(0);
 				break;
 			case CLOSE:
 				if (this.openPoints.isEmpty()) {
@@ -105,10 +92,24 @@ public class DFAMaker {
 							break;
 						}
 					}
-					this.currentState.setChoiceLevel(
-							this.openPoints.get(this.openPoints.size() - 1)
-									.getState().getChoiceNumber(),
-							this.routeLevel.get(this.routeLevel.size() - 1));
+				}
+				if (!(this.predicatePoints.isEmpty())) {
+					if (this.predicatePoints.get(
+							this.predicatePoints.size() - 1).getPositionLabel() + 1 == this.openPoints
+							.get(this.openPoints.size() - 1).getPositionLabel()) {
+						if (this.repetitionFlag) {
+							System.out
+									.println("Position of repetition operator(*) is invalid.");
+							throw new SyntaxErrorException();
+						}
+						this.currentState = this.predicatePoints.get(
+								this.predicatePoints.size() - 1).getState();
+						this.predicateDepth = this.predicatePoints.get(
+								this.predicatePoints.size() - 1)
+								.getDepthLabel();
+						this.predicatePoints
+								.remove(this.predicatePoints.size() - 1);
+					}
 				}
 				if (this.optionalFlag) {
 					this.openPoints
@@ -130,21 +131,7 @@ public class DFAMaker {
 					this.repetitionFlag = false;
 					position++;
 				}
-				if (!(this.predicatePoints.isEmpty())) {
-					if (this.predicatePoints.get(
-							this.predicatePoints.size() - 1).getPositionLabel() + 1 == this.openPoints
-							.get(this.openPoints.size() - 1).getPositionLabel()) {
-						this.currentState = this.predicatePoints.get(
-								this.predicatePoints.size() - 1).getState();
-						this.predicateDepth = this.predicatePoints.get(
-								this.predicatePoints.size() - 1)
-								.getDepthLabel();
-						this.predicatePoints
-								.remove(this.predicatePoints.size() - 1);
-					}
-				}
 				this.openPoints.remove(this.openPoints.size() - 1);
-				this.routeLevel.remove(this.routeLevel.size() - 1);
 				break;
 			case PREDICATE:
 				PredicateTransition predicateTransition = new PredicateTransition();
@@ -190,6 +177,11 @@ public class DFAMaker {
 					this.optionalFlag = true;
 					position++;
 				} else if (Token.getEnum(tokenList.get(position + 1)) == Token.REPETITION) {
+					if (this.predicateFlag) {
+						System.out
+								.println("Position of repetition operator(*) is invalid.");
+						throw new SyntaxErrorException();
+					}
 					this.repetitionFlag = true;
 					position++;
 				}

@@ -3,6 +3,7 @@ package predicate_to_DFA;
 import java.util.ArrayList;
 
 public class DFAReshaper {
+	private EOSSearcher eosSearcher;
 	private EpsilonEraser epsilonEraser;
 	private PredicateMarger predicateMarger;
 	private Marger marger;
@@ -11,6 +12,7 @@ public class DFAReshaper {
 	private ArrayList<State> stateList;
 
 	public DFAReshaper() {
+		eosSearcher = new EOSSearcher();
 		epsilonEraser = new EpsilonEraser();
 		predicateMarger = new PredicateMarger();
 		marger = new Marger();
@@ -20,6 +22,7 @@ public class DFAReshaper {
 
 	public void reshapeDEA(ArrayList<State> stateList, int maxPredicateDepth)
 			throws CodingErrorException {
+		eosSearcher.searchEOS(stateList);
 		while (maxPredicateDepth >= 0) {
 			epsilonEraser.eraseEpsilon(stateList);
 			predicateMarger.margePredicate(stateList, maxPredicateDepth);

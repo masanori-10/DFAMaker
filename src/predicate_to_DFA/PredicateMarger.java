@@ -14,11 +14,11 @@ public class PredicateMarger {
 				Transition currentTransition = currentState
 						.getNextTransitions().get(transitionNumber);
 				if (currentTransition instanceof PredicateTransition) {
+					State predicateState = ((PredicateTransition) currentTransition)
+							.getPredicateNextState();
 					if (((PredicateTransition) currentTransition)
 							.getPreicateDepth() == predicateDepth) {
-						State predicateState = ((PredicateTransition) currentTransition)
-								.getPredicateNextState();
-						this.searchEnd(predicateState);
+						this.searchEndAndSetEOP(predicateState);
 						boolean predefined = false;
 						ArrayList<Integer> coStateNumbers = new ArrayList<Integer>();
 						coStateNumbers.addAll(currentTransition.getNextState()
@@ -67,12 +67,12 @@ public class PredicateMarger {
 		}
 	}
 
-	private void searchEnd(State state) {
+	private void searchEndAndSetEOP(State state) {
 		if (state.getNextTransitions().isEmpty()) {
 			state.setEOP();
 		} else {
 			for (Transition transition : state.getNextTransitions()) {
-				searchEnd(transition.getNextState());
+				searchEndAndSetEOP(transition.getNextState());
 			}
 		}
 	}
