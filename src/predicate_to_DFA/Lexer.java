@@ -12,8 +12,7 @@ public class Lexer {
 
 	public Lexer() {
 		this.token = new ArrayList<String>();
-		this.pToken = Pattern
-				.compile("^([a-z]|\\(|\\)|\\/|\\.|!|\\?|\\*)$");
+		this.pToken = Pattern.compile("^([a-z]|\\(|\\)|\\/|\\.|!|\\?|\\*|E)$");
 		this.pSpace = Pattern.compile("^[\\s]$");
 	}
 

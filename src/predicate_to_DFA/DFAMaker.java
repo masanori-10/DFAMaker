@@ -164,11 +164,14 @@ public class DFAMaker {
 				break;
 			case ANY:
 			case OTHER:
+			case EPSILON:
 				Transition transition = new Transition();
 				State nextState = new State();
 				this.stateList.add(nextState);
 				if (this.token == Token.ANY) {
 					transition.setSymbolCase(SymbolCase.ANY);
+				} else if (this.token == Token.EPSILON) {
+					transition = new EpsilonTransition(nextState);
 				} else {
 					transition.setSymbolAndCase(tokenList.get(position),
 							SymbolCase.SYMBOL);

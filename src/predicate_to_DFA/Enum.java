@@ -4,7 +4,7 @@ public class Enum {
 
 	public enum Token {
 		CHOICE("/"), ANY("."), PREDICATE("!"), OPTIONAL("?"), REPETITION("*"), OPEN(
-				"("), CLOSE(")"), OTHER;
+				"("), CLOSE(")"), EPSILON("E"), OTHER;
 		private String name;
 
 		public String getName() {
