@@ -36,9 +36,9 @@ public class Reader {
 	}
 
 	public void readFile(String arg) throws IOException, FileReadException {
-		String path = "C:\\Users\\MasanoriSato\\Documents\\GitHub\\workspace\\predicate_to_DFA\\predicate_code";
+		String path = "/Users/masanorisato/Documents/workspace/DFAMaker/predicate_code";
 		File inputFile;
-		inputFile = new File(path + "\\" + arg + ".txt");
+		inputFile = new File(path + "/" + arg + ".txt");
 		if (!inputFile.exists()) {
 			System.out.println("File not found.");
 			System.out.println("Please pass any of the following argument.");
