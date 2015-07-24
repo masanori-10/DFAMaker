@@ -20,10 +20,8 @@ public class Main {
 			lexer.lexe(reader.getInputLine());
 			pegReshaper.reshapePEG(lexer.getToken());
 			dfaMaker.makeDFA(pegReshaper.getTokenList());
-			dfaReshaper.reshapeDEA(dfaMaker.getStateList(),
-					dfaMaker.getMaxPredicateDepth());
-			printer.printDOTFile(dfaReshaper.getStateList(),
-					reader.getInputLine());
+			dfaReshaper.reshapeDEA(dfaMaker.getStateList(), dfaMaker.getMaxPredicateDepth());
+			printer.printDOTFile(dfaReshaper.getStateList());
 
 		} catch (IOException e) {
 			System.out.println(e + "(Input is invalid.)");

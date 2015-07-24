@@ -18,7 +18,7 @@ class NonDefinedTokenException extends Exception {
 	}
 }
 
-class CodingErrorException extends Exception {
+public class CodingErrorException extends Exception {
 	public CodingErrorException(){
 		super("Coding error.");
 	}
